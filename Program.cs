@@ -11,6 +11,7 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Timers;
 
 namespace Alfie_Host
 {
@@ -54,16 +55,54 @@ namespace Alfie_Host
                 return;
             }
             Console.OutputEncoding = Encoding.UTF8;
+
+            Timer dailyTimer = new Timer((DateTime.Today.AddDays(1) - DateTime.Now).TotalMilliseconds);
+            dailyTimer.AutoReset = false;
+            dailyTimer.Elapsed += DailyTimer_Elapsed;
+            dailyTimer.Start();
+
             program.MainAsync().GetAwaiter().GetResult();
         }
+
+        private static void DailyTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            (sender as Timer).Interval = (DateTime.Today.AddDays(1) - DateTime.Now).TotalMilliseconds;
+            (sender as Timer).Start();
+            try
+            {
+                Log(new LogMessage(LogSeverity.Info, "Groups", "Group update started."));
+                var newGroups = RSUHScheduleAPI.GetGroups().GetAwaiter().GetResult();
+                var oldGroups = Data.GroupStorage.Load().GetAwaiter().GetResult();
+                var resultGroups = oldGroups.Intersect(newGroups).ToDictionary(pair => pair.Key, pair => pair.Value);
+                if (resultGroups == null)
+                    resultGroups = new Dictionary<string, int>();
+                int cnt = 0;
+                foreach(var group in newGroups)
+                    if(!resultGroups.Contains(group))
+                    {
+                        cnt++;
+                        resultGroups.Add(group.Key, group.Value);
+                    }
+                Data.GroupStorage.Save(resultGroups).GetAwaiter().GetResult();
+                Log(new LogMessage(LogSeverity.Info, "Groups", $"Group update finished. {cnt} change(s) made."));
+            }
+            catch(Exception ex)
+            {
+                Log(new LogMessage(LogSeverity.Info, "Groups", "", ex));
+            }
+        }
+
         public static string StartUpPath;
         private DiscordSocketClient _client;
         private Settings _settings;
         private CommandService _commandservice;
 
-        private Task Log(LogMessage msg)
+        private static Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            if(msg.Exception != null)
+                if(msg.Exception.Message == "WebSocket connection was closed")
+                    return Task.CompletedTask;
+            Console.WriteLine(msg.ToString(fullException: false));
             return Task.CompletedTask;
         }
 
@@ -83,7 +122,6 @@ namespace Alfie_Host
 
             await _client.LoginAsync(_settings.TokenType, _settings.Token);
             await _client.StartAsync();
-            
             await _client.SetActivityAsync(new Game(_settings.Activity, _settings.ActivityType));
             await new CommandHandler(_client, _commandservice, Log).InstallCommandsAsync();
 

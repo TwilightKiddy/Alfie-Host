@@ -1,16 +1,8 @@
-﻿using System;
-using Discord;
-using Discord.Net;
-using Discord.API;
-using Discord.Webhook;
-using Discord.WebSocket;
-using Discord.Commands;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Threading.Tasks;
+﻿using Discord.Commands;
 using Newtonsoft.Json;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Alfie_Host.Data
 {
@@ -70,9 +62,9 @@ namespace Alfie_Host.Data
             if (channels.Contains(id))
                 return;
             StreamWriter writer = new StreamWriter(Program.StartUpPath + ChannelsFile);
-            
-            
-            await writer.WriteAsync(JsonConvert.SerializeObject(channels.Append(id)));
+
+
+            await writer.WriteAsync(JsonConvert.SerializeObject(channels.Append(id), Formatting.Indented));
             writer.Close();
             writer.Dispose();
         }
@@ -90,7 +82,7 @@ namespace Alfie_Host.Data
             if (!Directory.Exists(Path.GetDirectoryName(Program.StartUpPath + ChannelsFile)))
                 Directory.CreateDirectory(Path.GetDirectoryName(Program.StartUpPath + ChannelsFile));
             StreamWriter writer = new StreamWriter(Program.StartUpPath + ChannelsFile);
-            await writer.WriteAsync(JsonConvert.SerializeObject(channels.Where((ulong _id) => { return _id != id; })));
+            await writer.WriteAsync(JsonConvert.SerializeObject(channels.Where((ulong _id) => { return _id != id; }), Formatting.Indented));
             writer.Close();
             writer.Dispose();
         }

@@ -162,10 +162,10 @@ namespace Alfie_Host
             return result;
         }
 
-        public static async Task<List<KeyValuePair<string, int>>> GetGroups()
+        public static async Task<Dictionary<string, int>> GetGroups()
         {
             var tasks = new List<Task<List<KeyValuePair<string, int>>>>();
-            var result = new List<KeyValuePair<string, int>>();
+            var result = new Dictionary<string, int>();
             byte[] grades = { 5, 5, 4, 4, 2 };
             char[] forms = { 'Д', 'В', 'З', '2', 'М' };
             for (byte i = 0; i < 5; i++)
@@ -173,7 +173,8 @@ namespace Alfie_Host
                     tasks.Add(_getGroups(j, forms[i]));
             await Task.WhenAll(tasks);
             foreach (var task in tasks)
-                result.AddRange(task.Result);
+                foreach(var group in task.Result)
+                    result.Add(group.Key, group.Value);
             return result;
         }
 
@@ -226,10 +227,10 @@ namespace Alfie_Host
         public static Image ScheduleToImage(List<Day> schedule, Color textColor, Color backColor)
         {
             const int LongStringsMaxLength = 30;
-            Font headersFont = new Font("Serif", 24, FontStyle.Underline);
-            Font subHeadersFont = new Font("Serif", 24, FontStyle.Bold);
-            Font textFont = new Font("Serif", 24, FontStyle.Regular);
-            string[] subHeaders = new string[] { "#", "Гр.", "П/Гр.", "Ауд.", "Тип", "Предмет", "Лектор" };
+            Font headersFont = new Font("Helvetica", 32, FontStyle.Underline);
+            Font subHeadersFont = new Font("Helvetica", 32, FontStyle.Bold);
+            Font textFont = new Font("Helvetica", 32, FontStyle.Regular);
+            string[] subHeaders = new string[] { "#", "Гр.", "П/Гр.", "Ауд.", "Предмет", "Тип", "Лектор" };
             float tmp1 = 0;
 
             Image img = new Bitmap(1, 1);
@@ -244,8 +245,8 @@ namespace Alfie_Host
             }
             for (int i = 0; i < 7; i++)
             {
-                if (tmp1 < drawing.MeasureString(subHeaders[i], textFont).Width)
-                    tmp1 = drawing.MeasureString(subHeaders[i], textFont).Width;
+                if (tmp1 < drawing.MeasureString(subHeaders[i], subHeadersFont).Width)
+                    tmp1 = drawing.MeasureString(subHeaders[i], subHeadersFont).Width;
                 foreach (var day in schedule)
                     foreach (var period in day.Periods)
                     {
@@ -262,6 +263,7 @@ namespace Alfie_Host
             drawing = Graphics.FromImage(img);
             drawing.Clear(backColor);
             Brush textBrush = new SolidBrush(textColor);
+            //drawing.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
             float x = 0;
             float y = 0;
