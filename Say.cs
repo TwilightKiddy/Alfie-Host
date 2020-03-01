@@ -17,7 +17,15 @@ namespace Alfie_Host
     public class Say : ModuleBase<SocketCommandContext>
     {
         [Command("say")]
-        public Task SayAsync([Remainder] string echo)
-            => ReplyAsync(echo);
+        public async Task SayAsync([Remainder] string echo)
+        {
+            try
+            {
+                await Context.Message.DeleteAsync();
+            }
+            catch { }
+            await ReplyAsync(echo);
+            return;
+        }
     }
 }

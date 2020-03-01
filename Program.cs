@@ -102,7 +102,7 @@ namespace Alfie_Host
             if(msg.Exception != null)
                 if(msg.Exception.Message == "WebSocket connection was closed")
                     return Task.CompletedTask;
-            Console.WriteLine(DateTime.Now.ToString("[dd.MM.yyyy hh:mm:ss] ") + msg.ToString(fullException: false, prependTimestamp: false));
+            Console.WriteLine(DateTime.Now.ToString("[dd.MM.yyyy HH:mm:ss] ") + msg.ToString(fullException: false, prependTimestamp: false));
             return Task.CompletedTask;
         }
 

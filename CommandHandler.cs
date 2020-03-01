@@ -44,9 +44,9 @@ namespace Alfie_Host
 
             int argPos = 0;
             var context = new SocketCommandContext(_client, message);
-
             if (!(message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
-                await Data.ChannelStorage.Contains(context.Channel.Id)) ||
+                await Data.ChannelStorage.Contains(context.Channel.Id) ||
+                context.IsPrivate) ||
                 message.Author.IsBot)
                 return;
             
