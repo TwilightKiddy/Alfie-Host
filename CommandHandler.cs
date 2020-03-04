@@ -1,17 +1,9 @@
-﻿using System;
-using Discord;
-using Discord.Net;
-using Discord.API;
-using Discord.Webhook;
-using Discord.WebSocket;
+﻿using Discord;
 using Discord.Commands;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Discord.WebSocket;
+using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Alfie_Host
 {

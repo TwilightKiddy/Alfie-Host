@@ -236,10 +236,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cats.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Data\Channels.cs" />
     <Compile Include="Data\Groups.cs" />
+    <Compile Include="Data\Pixabay.cs" />
     <Compile Include="Data\Users.cs" />
+    <Compile Include="ImageSearch.cs" />
     <Compile Include="RSUHScheduleAPI.cs" />
     <Compile Include="Say.cs" />
     <Compile Include="Program.cs" />

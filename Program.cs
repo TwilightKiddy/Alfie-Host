@@ -1,16 +1,14 @@
-﻿using System;
-using Discord;
-using Discord.Net;
-using Discord.API;
-using Discord.Webhook;
-using Discord.WebSocket;
+﻿using Discord;
 using Discord.Commands;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Threading.Tasks;
+using Discord.WebSocket;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace Alfie_Host
@@ -18,6 +16,10 @@ namespace Alfie_Host
     public class Program
     {
         const string SettingsFile = "settings.json";
+
+        public static Random Random = new Random();
+        public static readonly HttpClient client = new HttpClient();
+
         struct Settings
         {
             public TokenType TokenType;

@@ -12,7 +12,7 @@ namespace Alfie_Host
     static class RSUHScheduleAPI
     {
         const string RSUHURL = "https://www.rsuh.ru/";
-        private static readonly HttpClient client = new HttpClient();
+        
         public class Period
         {
             private byte Number;
@@ -123,7 +123,7 @@ namespace Alfie_Host
                     { "fdate_month", end.Month.ToString("D2") },
                     { "fdate_day", end.Day.ToString("D2") }
                 });
-            var response = await client.PostAsync(RSUHURL + "rasp/3.php", content);
+            var response = await Program.client.PostAsync(RSUHURL + "rasp/3.php", content);
 
             HtmlDocument document = new HtmlDocument();
             document.LoadHtml("<html><body>" + await response.Content.ReadAsStringAsync() + "</body></html>");
@@ -205,7 +205,7 @@ namespace Alfie_Host
                     { "formob", form.ToString() },
                     { "kyrs", grade.ToString() }
                 });
-            var response = await client.PostAsync(RSUHURL + "rasp/2.php", content);
+            var response = await Program.client.PostAsync(RSUHURL + "rasp/2.php", content);
             HtmlDocument document = new HtmlDocument();
             document.LoadHtml("<html><body>" + await response.Content.ReadAsStringAsync() + "</body></html>");
             var options = document.DocumentNode.SelectNodes("//option");
@@ -263,7 +263,6 @@ namespace Alfie_Host
             drawing = Graphics.FromImage(img);
             drawing.Clear(backColor);
             Brush textBrush = new SolidBrush(textColor);
-            //drawing.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
             float x = 0;
             float y = 0;

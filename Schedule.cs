@@ -218,7 +218,7 @@ namespace Alfie_Host
             return;
         }
 
-        [Command("group"), Alias("id", "groupid")]
+        [Command("group", RunMode = RunMode.Async), Alias("id", "groupid")]
         public async Task GroupId(int id)
         {
             var groups = await Data.GroupStorage.Load();
@@ -244,7 +244,7 @@ namespace Alfie_Host
             await ReplyAsync($"Setting schedule group of {Context.User.Mention} to **`{group}`**.");
         }
 
-        [Command("find"), Alias("search", "f", "s")]
+        [Command("find", RunMode = RunMode.Async), Alias("search", "f", "s")]
         public async Task Find([Remainder] string pattern)
         {
             var groups = await Data.GroupStorage.Load();
