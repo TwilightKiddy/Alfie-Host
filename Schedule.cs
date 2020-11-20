@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ExcelDataReader;
+
 using Color = System.Drawing.Color;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
@@ -18,6 +20,7 @@ namespace Alfie_Host
         private Color defaultBackground = Color.FromArgb(255, 54, 57, 63);
         private Color defaultForeground = Color.FromArgb(255, 255, 255, 255);
         private const string scheduleTimeFile = "scheduletime.txt";
+        private const string scheduleAuditoriesFile = "auditories.xlsx";
 
         [Command("day"), Alias("d")]
         public async Task Day([Remainder] string day = "today")
@@ -37,7 +40,7 @@ namespace Alfie_Host
                     date = DateTime.Today.AddDays(1);
                     break;
                 default:
-                    if (!DateTime.TryParseExact(day, new string[]{ "d.M.y", "d/M/y", "d M y", "d.M", "d/M", "d M" },CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                    if (!DateTime.TryParseExact(day, new string[] { "d.M.y", "d/M/y", "d M y", "d.M", "d/M", "d M" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
                     {
                         if (int.TryParse(day, out int tmp))
                         {
@@ -146,7 +149,7 @@ namespace Alfie_Host
             {
                 foreground = defaultForeground;
             }
-            
+
             return new GroupAndColors
             {
                 Group = group,
@@ -255,7 +258,7 @@ namespace Alfie_Host
                 await Data.GroupStorage.Save(groups);
             }
             string prosessedpattern = pattern;
-            char[] specialchars = { '.', '$', '^', '{', '[', '(', '|', ')', '+', '\\'};
+            char[] specialchars = { '.', '$', '^', '{', '[', '(', '|', ')', '+', '\\' };
             foreach (char c in specialchars)
                 prosessedpattern = prosessedpattern.Replace(c.ToString(), "[" + c + "]");
             prosessedpattern = prosessedpattern.Replace("*", ".*");
@@ -300,7 +303,7 @@ namespace Alfie_Host
             {
                 foregroundColor = defaultForeground;
             }
-            
+
             if (!Data.UserStorage.Exists(Context.User.Id))
                 await Data.UserStorage.Create(Context.User.Id);
             var user = await Data.UserStorage.GetData(Context.User.Id);
@@ -328,7 +331,7 @@ namespace Alfie_Host
         [Command("time"), Alias("t")]
         public async Task Time()
         {
-            if(File.Exists(Program.StartUpPath + scheduleTimeFile))
+            if (File.Exists(Program.StartUpPath + scheduleTimeFile))
             {
                 StreamReader reader = new StreamReader(Program.StartUpPath + scheduleTimeFile);
                 await ReplyAsync(await reader.ReadToEndAsync());
@@ -344,6 +347,52 @@ namespace Alfie_Host
                 await ReplyAsync("No data set to display for this command.");
             }
             return;
+        }
+
+        [Command("auditory"), Alias("a", "o", "online")]
+        public async Task Auditory(string auditory)
+        {
+            if(!Regex.IsMatch(auditory, @"^\d+$"))
+            {
+                await ReplyAsync("First argument must consist of digits only.");
+                return;
+            }
+            bool found = false;
+            var stream = new FileStream(Program.StartUpPath + scheduleAuditoriesFile, FileMode.Open);
+            var reader = ExcelReaderFactory.CreateReader(stream);
+            do
+            {
+                reader.Read();
+                while (reader.Read())
+                {
+                    try
+                    {
+                        if (!Regex.IsMatch(reader.GetValue(0).ToString(), @"\d+"))
+                            continue;
+                        if (Regex.Match(reader.GetValue(0).ToString(), @"\d+").Value == auditory)
+                        {
+                            found = true;
+                            break;
+                        }
+                    } catch { }
+                }
+                if (found)
+                    break;
+            } while (reader.NextResult());
+            
+            if(!found)
+            {
+                await ReplyAsync($"Could not find anything matching `{auditory}`.");
+                reader.Close();
+                return;
+            }
+            await ReplyAsync(
+                $"Auditory: `{reader.GetValue(0).ToString()}`\n" +
+                $"Login: `{reader.GetValue(2).ToString()}`\n" +
+                $"Password: `{reader.GetValue(3).ToString()}`\n" +
+                "Link: " +
+                reader.GetValue(4).ToString());
+            reader.Close();
         }
     }
 }
