@@ -45,6 +45,12 @@
 
 Пример: `s t`
 
+* `auditory, a, online, o <number>`
+
+Выводит информацию о онлайн аудитории с номером number.
+
+Пример: `s o 140`
+
 
 ### channels, channel, c
 
