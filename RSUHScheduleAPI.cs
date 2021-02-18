@@ -166,7 +166,7 @@ namespace Alfie_Host
         {
             var tasks = new List<Task<List<KeyValuePair<string, int>>>>();
             var result = new Dictionary<string, int>();
-            byte[] grades = { 5, 5, 4, 4, 2 };
+            byte[] grades = { 5, 5, 5, 3, 2 };
             char[] forms = { 'Д', 'В', 'З', '2', 'М' };
             for (byte i = 0; i < 5; i++)
                 for (byte j = 1; j <= grades[i]; j++)
@@ -213,6 +213,7 @@ namespace Alfie_Host
                 return null;
             foreach (var node in options)
                 result.Add(new KeyValuePair<string, int>($"{node.InnerText}, {grade} курс, {formstring}", int.Parse(node.GetAttributeValue("value", ""))));
+            //Console.WriteLine($"{form} {grade}");
             return result;
         }
 
